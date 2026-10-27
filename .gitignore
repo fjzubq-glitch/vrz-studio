@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output
+
+# Production builds
+release/
+portable/
+dist/
+build/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Local data
+VRZ Studio Data/
+tutorial-test-userdata/
+selftest-output/
+floating-test.log
+floating-test.png
+tutorial-test.log
+tutorial-test.png
+crop*/ 
+mic*/ 
+smoke*/ 
+
+# Electron
+out/
+*.asar.bak
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+desktop.ini
+$RECYCLE.BIN/

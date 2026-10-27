@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data: vrl:; media-src 'self' vrl: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; connect-src 'self' blob: vrl:"
+    />
+    <title>VRZ Studio</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="titlebar">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2.5" y="4.5" width="14" height="15" rx="3.2" />
+            <path d="M18.5 9.5 22 7.6v8.8l-3.5-1.9z" />
+            <circle cx="9.4" cy="12" r="2.4" class="brand-dot" />
+          </svg>
+        </span>
+        <span class="brand-name">VRZ <em>Studio</em></span>
+      </div>
+      <div class="titlebar-grip"></div>
+      <div class="window-actions">
+        <button data-win="min" title="Minimizar" aria-label="Minimizar">&#8211;</button>
+        <button data-win="max" title="Maximizar" aria-label="Maximizar">&#9723;</button>
+        <button data-win="close" class="close" title="Cerrar" aria-label="Cerrar">&#10005;</button>
+      </div>
+    </div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <nav class="nav">
+          <button class="nav-item active" data-view="record">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.2" /><circle cx="12" cy="12" r="3" class="fill" /></svg>
+            Grabar
+          </button>
+          <button class="nav-item" data-view="library">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="7.5" height="7.5" rx="2" /><rect x="13.5" y="4" width="7.5" height="7.5" rx="2" /><rect x="3" y="14.5" width="7.5" height="5.5" rx="2" /><rect x="13.5" y="14.5" width="7.5" height="5.5" rx="2" /></svg>
+            Biblioteca
+          </button>
+          <button class="nav-item" data-view="settings">
+            <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" /><circle cx="16" cy="7" r="2.2" /><circle cx="10" cy="17" r="2.2" /></svg>
+            Ajustes
+          </button>
+        </nav>
+
+        <div class="sidebar-card privacy-card">
+          <span class="privacy-pulse"></span>
+          <div>
+            <strong>Privado por diseño</strong>
+            <p>Tus grabaciones se guardan solo en este equipo.</p>
+          </div>
+        </div>
+        <div class="sidebar-foot">
+          <div class="foot-top">
+            <span id="appVersion">v1.0.0</span>
+            <span class="dot-sep"></span>
+            <span>Local</span>
+          </div>
+          <div class="foot-bottom">
+            <div class="byline-main">Built by Franklin Zaldaña</div>
+            <div class="byline-sub">AI-assisted</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <section class="view active" id="view-record">
+          <header class="page-head">
+            <div>
+              <p class="eyebrow">Estudio</p>
+              <h1>Nueva grabación</h1>
+              <p class="sub">Pantalla, cámara y micrófono en un solo clic.</p>
+              <div class="mode-switch" id="modeSwitch" role="group" aria-label="Tipo de grabación">
+                <button type="button" data-mode="class" class="active">Clase</button>
+                <button type="button" data-mode="tutorial">Tutorial</button>
+              </div>
+            </div>
+            <div class="rec-pill hidden" id="recPill">
+              <span class="rec-dot"></span>
+              <span id="recTime">00:00</span>
+              <span class="rec-paused hidden" id="recPaused">Pausado</span>
+            </div>
+          </header>
+
+          <div class="stage" id="stage">
+            <div class="stage-media">
+              <canvas id="canvas"></canvas>
+              <img id="stageThumb" alt="" />
+            </div>
+            <div class="stage-empty" id="stageEmpty">
+              <div class="stage-icon">
+                <svg viewBox="0 0 24 24"><rect x="2.5" y="4.5" width="14" height="15" rx="3" /><path d="M18.5 9.5 22 7.6v8.8l-3.5-1.9z" /><path d="M7 9.5h5" /></svg>
+              </div>
+              <h2>¿Qué quieres grabar?</h2>
+              <p>Elige una pantalla completa o una ventana concreta.</p>
+              <button class="btn primary" id="btnPick">Elegir fuente</button>
+            </div>
+            <span class="stage-badge hidden" id="stageBadge">Vista previa</span>
+            <div class="stage-loading hidden" id="stageLoading"><span class="spinner"></span> Preparando captura…</div>
+          </div>
+
+          <div class="toolbar">
+            <button class="chip source-chip" id="chipSource" title="Cambiar fuente">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="2.4" /><path d="M8 20h8" /></svg>
+              <span id="sourceName">Sin fuente</span>
+            </button>
+
+            <button class="chip" id="chipCrop" title="Recortar el área a grabar" disabled>
+              <svg viewBox="0 0 24 24"><path d="M7 3v14a2 2 0 0 0 2 2h12" /><path d="M3 7h14a2 2 0 0 1 2 2v12" /></svg>
+              <span id="cropLabel">Recortar</span>
+            </button>
+
+            <div class="tool-divider"></div>
+
+            <button class="chip" id="chipMic" title="Activa el micrófono solo cuando vayas a hablar">
+              <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" /></svg>
+              <span id="micLabel">Sin micrófono</span>
+            </button>
+            <div class="mic-meter" id="micMeter" title="Nivel de entrada del micrófono">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+
+            <button class="chip toggle" id="chipCam" title="Activar cámara">
+              <svg viewBox="0 0 24 24"><rect x="3" y="6" width="12.5" height="12" rx="3" /><path d="M15.5 10.5 21 7.5v9l-5.5-3z" /></svg>
+              Cámara
+            </button>
+
+            <button class="chip toggle" id="chipSys" title="Grabar también el audio del sistema">
+              <svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4.5v15M16 7v10M20 10v4" /></svg>
+              Audio sistema
+            </button>
+
+            <select class="mini-select" id="countdownSelect" title="Cuenta atrás">
+              <option value="3">3 s</option>
+              <option value="2">2 s</option>
+              <option value="1">1 s</option>
+              <option value="0">Sin cuenta</option>
+            </select>
+
+            <div class="toolbar-spacer"></div>
+
+            <button class="btn ghost hidden" id="btnPause">Pausar</button>
+            <button class="btn danger hidden" id="btnStop">Detener</button>
+            <button class="record" id="btnRecord" title="Grabar (Ctrl+Shift+R)">
+              <span class="record-core"></span>
+            </button>
+          </div>
+          <p class="hint" id="recordHint">Consejo: <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd> inicia o detiene. Mantén <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd> para hablar; al soltar, el micro se apaga.</p>
+        </section>
+
+        <section class="view" id="view-library">
+          <header class="page-head">
+            <div>
+              <p class="eyebrow">Tu contenido</p>
+              <h1>Biblioteca</h1>
+              <p class="sub" id="libSub">0 grabaciones</p>
+            </div>
+            <div class="head-actions">
+              <input class="search" id="search" type="search" placeholder="Buscar grabaciones…" />
+              <button class="btn ghost" id="btnFolder">Abrir carpeta</button>
+            </div>
+          </header>
+          <div class="grid" id="libraryGrid"></div>
+          <div class="empty hidden" id="emptyLib">
+            <div class="stage-icon small">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="7.5" height="7.5" rx="2" /><rect x="13.5" y="4" width="7.5" height="7.5" rx="2" /><rect x="3" y="14.5" width="7.5" height="5.5" rx="2" /><rect x="13.5" y="14.5" width="7.5" height="5.5" rx="2" /></svg>
+            </div>
+            <h2>Aún no hay grabaciones</h2>
+            <p>Graba tu primera pantalla y aparecerá aquí, lista para reproducir o compartir el archivo.</p>
+            <button class="btn primary" data-go="record">Empezar a grabar</button>
+          </div>
+        </section>
+
+        <section class="view" id="view-settings">
+          <header class="page-head">
+            <div>
+              <p class="eyebrow">Preferencias</p>
+              <h1>Ajustes</h1>
+              <p class="sub">Todo se aplica al instante y se recuerda en este equipo.</p>
+            </div>
+          </header>
+
+          <div class="settings-grid">
+            <article class="panel">
+              <h3>Apariencia</h3>
+              <p class="panel-sub">Elige el color de acento de la interfaz.</p>
+              <div class="swatches" id="swatches">
+                <button class="swatch" data-accent="#7c5cff" style="--sw:#7c5cff" aria-label="Violeta"></button>
+                <button class="swatch" data-accent="#22d3ee" style="--sw:#22d3ee" aria-label="Cian"></button>
+                <button class="swatch" data-accent="#34d399" style="--sw:#34d399" aria-label="Esmeralda"></button>
+                <button class="swatch" data-accent="#f472b6" style="--sw:#f472b6" aria-label="Rosa"></button>
+                <button class="swatch" data-accent="#fbbf24" style="--sw:#fbbf24" aria-label="Ámbar"></button>
+              </div>
+            </article>
+
+            <article class="panel">
+              <h3>Vídeo</h3>
+              <p class="panel-sub">Equilibra nitidez, tamaño y rendimiento.</p>
+              <label class="field">
+                <span>Calidad</span>
+                <select id="qualitySelect">
+                  <option value="source">Nativa de la pantalla</option>
+                  <option value="1080">Full HD (1080p)</option>
+                  <option value="720">HD (720p)</option>
+                  <option value="480">SD (480p)</option>
+                  <option value="360">360p · recomendado</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Fotogramas por segundo</span>
+                <select id="fpsSelect">
+                  <option value="24">24 fps</option>
+                  <option value="20">20 fps · ahorro</option>
+                  <option value="15">15 fps · mínimo</option>
+                  <option value="30">30 fps</option>
+                  <option value="60">60 fps</option>
+                </select>
+              </label>
+            </article>
+
+            <article class="panel">
+              <h3>Cámara</h3>
+              <p class="panel-sub">La burbuja se compone dentro del vídeo final.</p>
+              <label class="field row">
+                <span>Espejar imagen</span>
+                <input type="checkbox" id="mirrorToggle" class="switch" />
+              </label>
+              <label class="field">
+                <span>Tamaño de la burbuja</span>
+                <input type="range" id="bubbleSize" min="120" max="320" step="10" />
+              </label>
+              <label class="field">
+                <span>Esquina</span>
+                <select id="cornerSelect">
+                  <option value="br">Abajo a la derecha</option>
+                  <option value="bl">Abajo a la izquierda</option>
+                  <option value="tr">Arriba a la derecha</option>
+                  <option value="tl">Arriba a la izquierda</option>
+                </select>
+              </label>
+            </article>
+
+            <article class="panel">
+              <h3>Grabación</h3>
+              <p class="panel-sub">El micro empieza apagado: actívalo con el botón o mantén Ctrl+Shift+M mientras hablas.</p>
+              <label class="field">
+                <span>Micrófono</span>
+                <select id="micSelect"></select>
+              </label>
+              <label class="field">
+                <span>Cámara</span>
+                <select id="camSelect"></select>
+              </label>
+              <label class="field">
+                <span>Cuenta atrás</span>
+                <select id="countdownDefault">
+                  <option value="3">3 segundos</option>
+                  <option value="2">2 segundos</option>
+                  <option value="1">1 segundo</option>
+                  <option value="0">Sin cuenta atrás</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Modo del micrófono</span>
+                <select id="micModeSelect">
+                  <option value="off">Solo audio de la clase (micro apagado)</option>
+                  <option value="on">Micrófono encendido desde el inicio</option>
+                </select>
+              </label>
+              <label class="field row">
+                <span>Ir a la biblioteca al terminar</span>
+                <input type="checkbox" id="autoLibrary" class="switch" />
+              </label>
+            </article>
+
+            <article class="panel wide">
+              <h3>Almacenamiento</h3>
+              <p class="panel-sub">Archivos WebM con su miniatura y metadatos.</p>
+              <div class="path-row">
+                <code id="recDir">—</code>
+                <button class="btn ghost" id="btnOpenFolder">Abrir carpeta</button>
+              </div>
+            </article>
+
+            <article class="panel wide">
+              <h3>Atajos y detalles</h3>
+              <ul class="shortcut-list">
+                <li><span>Iniciar / detener grabación</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>R</kbd></li>
+                <li><span>Mantener para hablar (micro)</span><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>M</kbd></li>
+                <li><span>Cancelar cuenta atrás</span><kbd>Esc</kbd></li>
+                <li><span>Audio de la clase</span><em>Loopback del sistema (con o sin micro)</em></li>
+                <li><span>Formato de salida</span><em>WebM · VP9/VP8 + Opus</em></li>
+                <li><span>Procesado</span><em>Local, sin cuentas ni servidores</em></li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal hidden" id="sourceModal">
+      <div class="modal-card wide">
+        <header class="modal-head">
+          <div>
+            <h2>Elige una fuente</h2>
+            <p>Pantallas y ventanas disponibles ahora mismo.</p>
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" id="btnRefreshSources">Actualizar</button>
+            <button class="icon-btn" data-close="sourceModal" aria-label="Cerrar">&#10005;</button>
+          </div>
+        </header>
+        <div class="source-group-title">Pantallas</div>
+        <div class="source-grid" id="screenGrid"></div>
+        <div class="source-group-title">Ventanas</div>
+        <div class="source-grid" id="windowGrid"></div>
+        <div class="source-empty hidden" id="sourceEmpty">No se encontraron fuentes. Pulsa «Actualizar».</div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="playerModal">
+      <div class="modal-card player">
+        <header class="modal-head">
+          <div>
+            <h2 id="playerTitle">Grabación</h2>
+            <p id="playerMeta"></p>
+          </div>
+          <div class="modal-actions">
+            <button class="btn ghost" id="btnPlayerFolder">Abrir carpeta</button>
+            <button class="icon-btn" data-close="playerModal" aria-label="Cerrar">&#10005;</button>
+          </div>
+        </header>
+        <video id="player" controls playsinline></video>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="cropModal">
+      <div class="modal-card crop-card">
+        <header class="modal-head">
+          <div>
+            <h2>Recortar área</h2>
+            <p>Selecciona solo el contenido de la clase: sin pestañas, barras ni escritorio.</p>
+          </div>
+          <div class="modal-actions">
+            <button class="icon-btn" data-close="cropModal" aria-label="Cerrar">&#10005;</button>
+          </div>
+        </header>
+        <div class="crop-stage">
+          <div class="crop-frame" id="cropFrame">
+            <img id="cropImage" alt="" draggable="false" />
+            <div class="crop-box" id="cropBox">
+              <span class="crop-handle nw" data-dir="nw"></span>
+              <span class="crop-handle ne" data-dir="ne"></span>
+              <span class="crop-handle sw" data-dir="sw"></span>
+              <span class="crop-handle se" data-dir="se"></span>
+              <span class="crop-size" id="cropSize"></span>
+            </div>
+          </div>
+        </div>
+        <div class="crop-toolbar">
+          <button class="chip" data-preset="full">Completa</button>
+          <button class="chip" data-preset="center">16:9 centro</button>
+          <button class="chip" data-preset="bottom">16:9 inferior</button>
+          <button class="chip" data-preset="last">Último recorte</button>
+          <span class="crop-hint">Arrastra el recuadro y ajusta las esquinas.</span>
+        </div>
+        <div class="modal-foot">
+          <button class="btn ghost" id="btnCropClear">Quitar recorte</button>
+          <button class="btn ghost" data-close="cropModal">Cancelar</button>
+          <button class="btn primary" id="btnCropApply">Aplicar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="promptModal">
+      <div class="modal-card narrow">
+        <header class="modal-head">
+          <h2>Renombrar grabación</h2>
+        </header>
+        <label class="field">
+          <span>Título</span>
+          <input id="renameInput" type="text" maxlength="90" />
+        </label>
+        <div class="modal-foot">
+          <button class="btn ghost" data-close="promptModal">Cancelar</button>
+          <button class="btn primary" id="btnRenameSave">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="countdown hidden" id="countdown">
+      <span class="countdown-label">Prepárate</span>
+      <span class="countdown-number" id="countdownNumber">3</span>
+      <span class="countdown-hint">Pulsa Esc para cancelar</span>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>VRZ Studio</title>
+    <link rel="stylesheet" href="floating.css" />
+  </head>
+  <body>
+    <div class="mini" id="panel">
+      <button class="brand" id="restore" type="button" title="Abrir VRZ Studio" aria-label="Abrir VRZ Studio">
+        <span class="live-dot" id="liveDot"></span>
+      </button>
+
+      <span class="grip" aria-hidden="true"></span>
+
+      <div class="readout">
+        <strong id="time" aria-live="off">00:00</strong>
+        <span id="status">Grabando</span>
+      </div>
+
+      <div class="actions">
+        <button class="mini-btn mic" id="mic" type="button" title="Activar micrófono" aria-label="Activar micrófono">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="9" y="3.5" width="6" height="10" rx="3" />
+            <path d="M6.5 11a5.5 5.5 0 0 0 11 0M12 16.5V20M9 20h6" />
+          </svg>
+        </button>
+
+        <button class="mini-btn pause" id="pause" type="button" title="Pausar grabación" aria-label="Pausar grabación">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5v14M16 5v14" />
+          </svg>
+        </button>
+
+        <button class="mini-btn stop" id="stop" type="button" title="Detener grabación" aria-label="Detener grabación">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="7" y="7" width="10" height="10" rx="1.5" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <script src="floating.js"></script>
+  </body>
+</html>

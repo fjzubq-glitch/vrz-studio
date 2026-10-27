@@ -1,0 +1,23 @@
+{
+  "name": "vrz-studio",
+  "productName": "VRZ Studio",
+  "version": "1.0.0",
+  "description": "VRZ Studio: grabador de pantalla local con camara, microfono y biblioteca de grabaciones",
+  "main": "src/main.js",
+  "author": "VRZ Studio",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "self-test": "electron . --self-test",
+    "crop-test": "electron . --crop-test",
+    "mic-test": "electron . --mic-test",
+    "floating-test": "electron . --floating-test",
+    "pack": "electron-packager . \"VRZ Studio\" --platform=win32 --arch=x64 --out=release --overwrite --icon=assets/icon.ico --asar --ignore=\"^/(release|release-portable|portable|selftest-output|croptest-output|mictest-output|docs)(/|$)\" --ignore=\"^/(smoke[^/]*\\.(log|png)|crop-[^/]*\\.(log|png)|mic-[^/]*\\.(log|png)|floating-[^/]*\\.(log|png))$\"",
+    "pack:portable": "electron-packager . \"VRZ Studio\" --platform=win32 --arch=x64 --out=portable --overwrite --icon=assets/icon.ico --asar --ignore=\"^/(release|release-portable|portable|selftest-output|croptest-output|mictest-output|docs)(/|$)\" --ignore=\"^/(smoke[^/]*\\.(log|png)|crop-[^/]*\\.(log|png)|mic-[^/]*\\.(log|png)|floating-[^/]*\\.(log|png))$\" && node -e \"require('fs').writeFileSync('portable/VRZ Studio-win32-x64/portable.flag','')\""
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.4.0",
+    "electron": "^44.9.2"
+  }
+}
